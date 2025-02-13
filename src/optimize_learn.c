@@ -17,14 +17,14 @@ float test_learn_range(perceptron *p, data *d, int epochs, float target_error) {
   for (int i = 0; i <= POWER; i++) {
     for (int j = 1; j < 10; j++) {
       float test_rate = (LEARNING_RATE * (float) j) * pow(10.0, i);
-      #ifdef OUTPUT_LEARN
+      #ifdef PRETTY_LEARN_OPTIMIZE
         printf(THEME "test rate:    ");
         printf(YELLOW "%.7f", test_rate);
         printf(THEME "   ");
       #endif
       random_weights(p);
       current = fit(p, d, epochs, test_rate, target_error);
-      #ifdef OUTPUT_LEARN
+      #ifdef PRETTY_LEARN_OPTIMIZE
         printf("epochs:    ");
         if (current < epochs) {
           printf(GREEN "%d", current + 1);
@@ -44,7 +44,7 @@ float test_learn_range(perceptron *p, data *d, int epochs, float target_error) {
       }
     }
   }
-  #ifdef OUTPUT_LEARN
+  #ifdef PRETTY_LEARN_OPTIMIZE
     printf("\nbest rate:    ");
     printf(GREEN "%.7f", best_rate);
     printf(THEME "   epochs:    ");

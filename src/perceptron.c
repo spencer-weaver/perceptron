@@ -44,14 +44,22 @@ void random_weights(perceptron *p) {
 perceptron *init_perceptron(int input_amount) {
   perceptron *p = malloc(sizeof(perceptron));
   if (p == NULL) {
-    printf("perceptron malloc failed\n");
+    printf(ERRORC "error");
+    printf(THEME ": ");
+    printf(VARIABLE "perceptron");
+    printf(THEME " malloc failed\n");
     free(p);
     return NULL;
   }
   p->input_amount = input_amount;
   p->weights = malloc(input_amount * sizeof(float));
   if (p->weights == NULL) {
-    printf("perceptron weights malloc failed\n");
+    printf(ERRORC "error");
+    printf(THEME ": ");
+    printf(VARIABLE "perceptron");
+    printf(THEME "->");
+    printf(VARIABLE "weights");
+    printf(THEME " malloc failed\n");
     free(p->weights);
     free(p);
     return NULL;
@@ -65,14 +73,22 @@ perceptron *init_perceptron(int input_amount) {
 inputs *init_inputs(int input_amount) {
   inputs *in = malloc(sizeof(inputs));
   if (in == NULL) {
-    printf("inputs malloc failed\n");
+    printf(ERRORC "error");
+    printf(THEME ": ");
+    printf(VARIABLE "inputs");
+    printf(THEME " malloc failed\n");
     free(in);
     return NULL;
   }
   in->input_amount = input_amount;
   in->data = malloc(input_amount * sizeof(float));
   if (in->data == NULL) {
-    printf("inputs data malloc failed\n");
+    printf(ERRORC "error");
+    printf(THEME ": ");
+    printf(VARIABLE "inputs");
+    printf(THEME "->");
+    printf(VARIABLE "data");
+    printf(THEME " malloc failed\n");
     free(in->data);
     free(in);
     return NULL;
@@ -84,7 +100,10 @@ inputs *init_inputs(int input_amount) {
 data *init_data(int data_amount, int input_amount) {
   data *d = malloc(data_amount * sizeof(data));
   if (d == NULL) {
-    printf("data malloc failed\n");
+    printf(ERRORC "error");
+    printf(THEME ": ");
+    printf(VARIABLE "data");
+    printf(THEME " malloc failed\n");
     free(d);
     return NULL;
   } else {
@@ -92,7 +111,12 @@ data *init_data(int data_amount, int input_amount) {
   }
   d->data = malloc(data_amount * sizeof(inputs *));
   if (d->data == NULL) {
-    printf("data data malloc failed\n");
+    printf(ERRORC "error");
+    printf(THEME ": ");
+    printf(VARIABLE "data");
+    printf(THEME "->");
+    printf(VARIABLE "data");
+    printf(THEME " malloc failed\n");
     free(d->data);
     free(d);
     return NULL;
@@ -102,7 +126,12 @@ data *init_data(int data_amount, int input_amount) {
   }
   d->targets = malloc(data_amount * sizeof(float));
   if (d->targets == NULL) {
-    printf("data targets malloc failed\n");
+    printf(ERRORC "error");
+    printf(THEME ": ");
+    printf(VARIABLE "data");
+    printf(THEME "->");
+    printf(VARIABLE "targets");
+    printf(THEME " malloc failed\n");
     free(d->targets);
     free(d->data);
     free(d);
@@ -194,7 +223,16 @@ void read_data(data *d) {
 //           p->weights and in->data are same length
 float linear(perceptron *p, inputs *in) {
   if (p->input_amount != in->input_amount) {
-    printf("error: p->weights and in->data are different lengths\n");
+    printf(ERRORC "error");
+    printf(THEME ": ");
+    printf(VARIABLE "p");
+    printf(THEME "->");
+    printf(VARIABLE "weights");
+    printf(THEME " and ");
+    printf(VARIABLE "in");
+    printf(THEME "->");
+    printf(VARIABLE "data");
+    printf(THEME " are different lengths\n");
     return -1;
   }
   float sum = 0;
@@ -333,6 +371,10 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
         printf(EPOCHC "%d\n", j + 1);
         printf(THEME "^^^^^^^^^^^^\n\n");
       #endif
+      #ifdef RAW_TRAIN
+        print_perceptron(p);
+        printf("\n");
+      #endif
       error += fabs(train(p, d->data[j], learning_rate, d->targets[j]));
       #ifdef PRETTY_TRAIN
         printf(THEME "  test error: ");
@@ -347,18 +389,21 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
       #endif
     }
     if (error < target_error) {
-      #ifdef PRETTY
+      #if defined(PRETTY) || defined(PRETTY_LEARN_OPTIMIZE)
         printf(THEME "\ntarget error reached on epoch ");
         printf(VARIABLE "%d", i + 1);
         printf(THEME ": ");
         printf(GREEN "%.7f", error);
-        #ifdef OUTPUT_LEARN
-          printf(THEME "  learning rate: ");
-          printf(YELLOW "%.7f", learning_rate);
-        #endif
+        printf(THEME "  learning rate: ");
+        printf(YELLOW "%.7f", learning_rate);
         printf(THEME "\n");
         print_perceptron(p);
         printf("\n\n");
+      #endif
+      #ifdef RAW
+        printf(BLUE "%d ", i + 1);
+        printf(GREEN "%.7f ", error);
+        printf(YELLOW "%.7f\n", learning_rate);
       #endif
       #ifdef OUTPUT_EPOCH
         printf("%d\n", i);
@@ -380,22 +425,28 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
     printf(THEME "\n");
   #endif
   return epochs;
-} 
+}
 
 // print_perceptron(p) prints the perceptron to the console
 // requires: p is not null
 // effects: writes to the console
 void print_perceptron(perceptron *p) {
-  printf(THEME "  perceptron:  ");
+  #ifndef RAW_TRAIN
+    printf(THEME "  perceptron:  ");
+  #endif
   for (int i = 0; i < p->input_amount; i++) {
-    printf(THEME " | ");
+    #ifndef RAW_TRAIN
+      printf(THEME " | ");
+    #endif
     if (p->weights[i] < 0) {
       printf(PERCEPTRONC "%.7f ", p->weights[i]);
     } else {
       printf(PERCEPTRONC " %.7f ", p->weights[i]);
     }
   }
-  printf(THEME " |\n");
+  #ifndef RAW_TRAIN
+    printf(THEME " |\n");
+  #endif
 }
 
 // print_inputs(in) prints the inputs to the console

@@ -10,29 +10,31 @@
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 #ifdef USE_COLOR
-#define THEME ANSI_COLOR_RESET
-#define EPOCHC ANSI_COLOR_GREEN
-#define VARIABLE ANSI_COLOR_BLUE
-#define INPUT ANSI_COLOR_CYAN
-#define PERCEPTRONC ANSI_COLOR_MAGENTA
 #define GREEN ANSI_COLOR_GREEN
 #define RED ANSI_COLOR_RED
 #define YELLOW ANSI_COLOR_YELLOW
 #define BLUE ANSI_COLOR_BLUE
-#define CLOSEC ANSI_COLOR_YELLOW
+#define THEME ANSI_COLOR_RESET
+#define EPOCHC GREEN
+#define VARIABLE BLUE
+#define INPUT ANSI_COLOR_CYAN
+#define PERCEPTRONC ANSI_COLOR_MAGENTA
+#define CLOSEC YELLOW
 #define FARC RED
+#define ERRORC RED
 #else
+#define GREEN
+#define RED
+#define BLUE
+#define YELLOW
 #define THEME
 #define EPOCHC
 #define VARIABLE
 #define INPUT
 #define PERCEPTRONC
-#define GREEN
-#define RED
-#define BLUE
-#define YELLOW
 #define CLOSEC
 #define FARC
+#define ERRORC
 #endif
 
 #endif
