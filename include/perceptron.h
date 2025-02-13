@@ -23,6 +23,7 @@ typedef struct {
 perceptron *init_perceptron(int input_amount);
 inputs *init_inputs(int input_amount);
 data *init_data(int data_amount, int input_amount);
+void random_weights(perceptron *p);
 float linear(perceptron *p, inputs *in);
 void read_inputs(inputs *in);
 void read_weights(perceptron *p);

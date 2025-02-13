@@ -1,10 +1,15 @@
 #include <stdio.h>
 #include "perceptron.h"
+#include "optimize_learn.h"
+
+#define EPOCHS 1000
+#define LEARNING_RATE 0.1
+#define TARGET_ERROR 0.0001
+
+//#define TEST_TRAIN_PERCEPTRON
+#define TEST_OPTIMIZE_LEARN
 
 int main(void) {
-
-  float learning_rate = 0.1;
-  int epochs = 10000;
   
   int input_count = 0;
   int data_count = 0;
@@ -17,7 +22,15 @@ int main(void) {
 
   read_data(d);
 
-  fit(p, d, epochs, learning_rate, 0.0001);
+  #ifdef TEST_TRAIN_PERCEPTRON
+  fit(p, d, EPOCHS, LEARNING_RATE, TARGET_ERROR);
+  #endif
+
+  #ifdef TEST_OPTIMIZE_LEARN  
+  float best = test_learn_range(p, d, EPOCHS, TARGET_ERROR);
+  random_weights(p);
+  fit(p, d, EPOCHS, best, TARGET_ERROR);
+  #endif
 
   free_perceptron(p);
   free_data(d);

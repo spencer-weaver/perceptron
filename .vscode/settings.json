@@ -5,6 +5,8 @@
         "array": "c",
         "string": "c",
         "string_view": "c",
-        "perceptron.h": "c"
+        "perceptron.h": "c",
+        "stdlib.h": "c",
+        "optimize_learn.h": "c"
     }
 }

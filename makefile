@@ -10,7 +10,7 @@ LIBS = -lm
 _DEPS = perceptron.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o perceptron.o
+_OBJ = main.o perceptron.o optimize_learn.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)

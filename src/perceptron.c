@@ -1,37 +1,10 @@
-#define PRETTY_TRAIN
-#define PRETTY
-#define USE_COLOR
-//#define OUTPUT_EPOCH
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "perceptron.h"
+#include "print_settings.h"
 #include "color.h"
-
-// color definitions
-#ifdef USE_COLOR
-#define THEME ANSI_COLOR_RESET
-#define EPOCH ANSI_COLOR_GREEN
-#define VARIABLE ANSI_COLOR_BLUE
-#define INPUT ANSI_COLOR_CYAN
-#define PERCEPTRONC ANSI_COLOR_MAGENTA
-#define GREEN ANSI_COLOR_GREEN
-#define RED ANSI_COLOR_RED
-#define CLOSEC ANSI_COLOR_YELLOW
-#define FARC RED
-#else
-#define THEME
-#define EPOCH
-#define VARIABLE
-#define INPUT
-#define PERCEPTRONC
-#define GREEN
-#define RED GREEN
-#define CLOSEC
-#define FARC
-#endif
 
 // range definitions
 #define CLOSE 0.0001
@@ -346,9 +319,9 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
     #ifdef PRETTY_TRAIN
       printf(THEME "\n_______________________\n");
       printf(THEME "                        \\\n");
-      printf(EPOCH "                   epoch");
+      printf(EPOCHC "                   epoch");
       printf(THEME ": ");
-      printf(EPOCH "%d\n", i + 1);
+      printf(EPOCHC "%d\n", i + 1);
       printf(THEME "                       /\n");
       printf(THEME "^^^^^^^^^^^^^^^^^^^^^^^\n");
     #endif
@@ -357,7 +330,7 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
         printf(THEME "\n____________\n");
         printf(THEME "        test");
         printf(THEME ": ");
-        printf(EPOCH "%d\n", j + 1);
+        printf(EPOCHC "%d\n", j + 1);
         printf(THEME "^^^^^^^^^^^^\n\n");
       #endif
       error += fabs(train(p, d->data[j], learning_rate, d->targets[j]));
@@ -365,7 +338,7 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
         printf(THEME "  test error: ");
         if (error < target_error) {
           printf(GREEN "%.7f", error);
-        } else if (error < CLOSE) {
+        } else if (error > CLOSE) {
           printf(CLOSEC "%.7f", error);
         } else {
           printf(FARC "%.7f", error);
@@ -375,7 +348,15 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
     }
     if (error < target_error) {
       #ifdef PRETTY
-        printf(THEME "\ntarget error reached on epoch " VARIABLE "%d" THEME ": " GREEN "%.7f\n", i + 1, error);
+        printf(THEME "\ntarget error reached on epoch ");
+        printf(VARIABLE "%d", i + 1);
+        printf(THEME ": ");
+        printf(GREEN "%.7f", error);
+        #ifdef OUTPUT_LEARN
+          printf(THEME "  learning rate: ");
+          printf(YELLOW "%.7f", learning_rate);
+        #endif
+        printf(THEME "\n");
         print_perceptron(p);
         printf("\n\n");
       #endif
@@ -387,14 +368,19 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
   }
   #ifdef PRETTY_TRAIN
     printf(THEME "\n");
-    printf(THEME "target epoch reached: ");
-    printf(EPOCH "%d", epochs);
-    printf(THEME "  epoch error: ");
+    printf(THEME "target epoch ");
+    printf(EPOCHC "%d", epochs);
+    printf(THEME " reached with ");
+    printf(THEME " epoch error: ");
     printf(RED "%.7f", error);
+    #ifdef OUTPUT_LEARN
+      printf(THEME "  learning rate: ");
+      printf(ANSI_COLOR_YELLOW "%.7f", learning_rate);
+    #endif
     printf(THEME "\n");
   #endif
   return epochs;
-}
+} 
 
 // print_perceptron(p) prints the perceptron to the console
 // requires: p is not null
