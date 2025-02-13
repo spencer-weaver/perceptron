@@ -365,7 +365,7 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
         printf(THEME "  epoch error: ");
         if (error < target_error) {
           printf(GREEN "%.7f", error);
-        } else if (error > CLOSE) {
+        } else if (error < CLOSE) {
           printf(CLOSEC "%.7f", error);
         } else {
           printf(FARC "%.7f", error);
