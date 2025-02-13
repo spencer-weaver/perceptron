@@ -1,20 +1,50 @@
-#define OUTPUT
+#define PRETTY_TRAIN
+#define PRETTY
+//#define OUTPUT_EPOCH
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "perceptron.h"
+#include "color.h"
+
+// color definitions
+#define THEME ANSI_COLOR_RESET
+#define EPOCH ANSI_COLOR_GREEN
+#define VARIABLE ANSI_COLOR_BLUE
+#define INPUT ANSI_COLOR_CYAN
+#define PERCEPTRONC ANSI_COLOR_MAGENTA
+
+// range definitions
+#define CLOSEC ANSI_COLOR_YELLOW
+#define FARC ANSI_COLOR_RED
+#define CLOSE 0.0001
 
 // random_weights(p) sets all of the weights of p to random values 0-1
 // requires: p is not null
 void random_weights(perceptron *p) {
+  #ifdef PRETTY_TRAIN
+    printf(THEME "initializing ");
+    printf(VARIABLE "perceptron");
+    printf(THEME ":\n");
+  #endif
   for (int i = 0; i < p->input_amount; i++) {
-    #ifdef OUTPUT
-    printf("setting weight[%d]: ", i);
+    #ifdef PRETTY_TRAIN
+      printf(THEME "  initializing ");
+      printf(VARIABLE "weight");
+      printf(THEME "[");
+      printf(VARIABLE "%d", i);
+      printf(THEME "]");
+      printf(THEME ": ");
     #endif
     p->weights[i] = (float) rand() / RAND_MAX;
-    #ifdef OUTPUT
-    printf("%.5f\n", p->weights[i]);
+    #ifdef PRETTY_TRAIN
+      if (p->weights[i] < 0) {
+        printf(INPUT "%.7f", p->weights[i]);
+      } else {
+        printf(INPUT " %.7f", p->weights[i]);
+      }
+      printf(THEME "\n");
     #endif
   }
   p->bias = (float) rand() / RAND_MAX;
@@ -114,8 +144,14 @@ void read_inputs(inputs *in) {
   float input = 0;
   for (int i = 0; i < in->input_amount; i++) {
     if (scanf(" %f", &input) == 1) {
-      #ifdef OUTPUT
-      printf("setting input[%d]: %.5f\n", i, input);
+      #ifdef PRETTY_TRAIN
+        printf("  setting ");
+        printf(VARIABLE "input");
+        printf(THEME "[");
+        printf(INPUT "%d", i);
+        printf(THEME "]:");
+        printf(INPUT " %.7f", input);
+        printf(THEME "\n");
       #endif
       in->data[i] = input;
     } else {
@@ -130,21 +166,38 @@ void read_inputs(inputs *in) {
 void read_data(data *d) {
   float input = 0;
   for (int i = 0; i < d->data_amount; i++) {
-    #ifdef OUTPUT
-    printf("setting data[%d]\n", i);
+    #ifdef PRETTY_TRAIN
+      printf("setting ");
+      printf(VARIABLE "data");
+      printf(THEME "[");
+      printf(INPUT "%d", i);
+      printf(THEME "]:\n");
     #endif
     read_inputs(d->data[i]);
   }
   for (int i = 0; i < d->data_amount; i++) {
     if (scanf(" %f", &input) == 1) {
       d->targets[i] = input;
-      #ifdef OUTPUT
-      printf("setting data->target[%d]: %.5f\n", i, input);
+      #ifdef PRETTY_TRAIN
+        printf("setting ");
+        printf(VARIABLE "target");
+        printf(THEME "[");
+        printf(INPUT "%d", i);
+        printf(THEME "]: ");
+        if (input < 0) {
+          printf(INPUT "%.7f", input);
+        } else {
+          printf(INPUT " %.7f", input);
+        }
+        printf(THEME "\n");
       #endif
     } else {
       d->targets[i] = 0;
     }
   }
+  #if defined(PRETTY_TRAIN) || defined(PRETTY)
+    printf("\n");
+  #endif
 }
 
 // linear(p) returns the weighted sum of the inputs and bias
@@ -152,7 +205,7 @@ void read_data(data *d) {
 //           p->weights and in->data are same length
 float linear(perceptron *p, inputs *in) {
   if (p->input_amount != in->input_amount) {
-    printf("p->weights and in->data are different lengths\n");
+    printf("error: p->weights and in->data are different lengths\n");
     return -1;
   }
   float sum = 0;
@@ -185,20 +238,83 @@ float loss(float prediction, float target) {
 float train(perceptron *p, inputs *in, float learning_rate, float target) {
   float prediction = predict(p, in);
   float error = loss(prediction, target);
-  #ifdef OUTPUT
-  printf("inputs:\n");
-  print_inputs(in);
-  printf("target: %.5f\n", target);
-  printf("prediction: %.5f\nerror: %.5f\n", prediction, error);
+  #ifdef PRETTY_TRAIN
+    print_inputs(in);
+    print_perceptron(p);
+    float neg = target;
+    if (neg < 0) {
+      printf(THEME "\n      target:     %.7f", neg);
+    } else {
+      printf(THEME "\n      target:      %.7f", neg);
+    }
+    printf(THEME "\n");
+    neg = prediction;
+    if (neg < 0) {
+      printf(THEME "      prediction: %.7f", neg);
+    } else {
+      printf(THEME "      prediction:  %.7f", neg);
+    }
+    printf(THEME "\n");
+    printf(THEME "      error:      ");
+    neg = target - prediction;
+    if (neg < 0) {
+      if (neg < CLOSE) {
+        printf(CLOSEC "%.7f", neg);
+      } else {
+        printf(FARC "%.7f", neg);
+      }
+    } else {
+      if (neg < CLOSE) {
+        printf(CLOSEC " %.7f", neg);
+      } else {
+        printf(FARC " %.7f", neg);
+      }
+    }
+    printf(THEME "\n\n");
   #endif
   for (int i = 0; i < p->input_amount; i++) {
-    #ifdef OUTPUT
-    printf("updating weight[%d]: %.5f -> %.5f\n", i, p->weights[i], p->weights[i] + learning_rate * error * in->data[i]);
+    #ifdef PRETTY_TRAIN
+      printf(THEME "    updating ");
+      printf(VARIABLE "weight");
+      printf(THEME "[");
+      printf(ANSI_COLOR_GREEN "%d", i);
+      printf(THEME "]: ");
+      neg = p->weights[i];
+      if (neg < 0) {
+        printf(ANSI_COLOR_RED "%.7f", neg);
+      } else {
+        printf(ANSI_COLOR_RED " %.7f", neg);
+      }
+      printf(THEME " -> ");
+      neg = p->weights[i] + learning_rate * error * in->data[i];
+      if (neg < 0) {
+        printf(ANSI_COLOR_GREEN "%.7f", neg);
+      } else {
+        printf(ANSI_COLOR_GREEN " %.7f", neg);
+      }
+      printf(THEME " \n");
     #endif
     p->weights[i] += learning_rate * error * in->data[i];
   }
-  #ifdef OUTPUT
-  printf("updating bias: %.5f -> %.5f\n", p->bias, p->bias + learning_rate * error);
+  #ifdef PRETTY_TRAIN
+    printf(THEME "    updating ");
+    printf(VARIABLE "bias");
+    printf(THEME ":     ");
+    neg = p->bias + learning_rate * error;
+    if (neg < 0) {
+      printf(ANSI_COLOR_RED " %.7f", neg);
+    } else {
+      printf(ANSI_COLOR_RED "  %.7f", neg);
+    }
+    printf(THEME " -> ");
+    neg = p->bias + learning_rate * error;
+    if (neg < 0) {
+      printf(ANSI_COLOR_GREEN "%.7f", neg);
+    } else {
+      printf(ANSI_COLOR_GREEN " %.7f", neg);
+    }
+    printf(THEME " \n");
+    printf("\n");
   #endif
   p->bias += learning_rate * error;
   return error;
@@ -207,41 +323,93 @@ float train(perceptron *p, inputs *in, float learning_rate, float target) {
 // fit(p, d, epochs) trains p to fit data d over epochs iterations. returns the
 //    last epoch needed before reaching target error or epochs
 // requires: p, d are not null
-void fit(perceptron *p, data *d, int epochs, float learning_rate, float target_error) {
+int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_error) {
   float error = 0;
   for (int i = 0; i < epochs; i++) {
-    #ifdef OUTPUT
-    printf("epoch: %d\n", i + 1);
+    error = 0;
+    #ifdef PRETTY_TRAIN
+      printf(THEME "\n_______________________\n");
+      printf(THEME "                        \\\n");
+      printf(EPOCH "                   epoch");
+      printf(THEME ": ");
+      printf(EPOCH "%d\n", i + 1);
+      printf(THEME "                       /\n");
+      printf(THEME "^^^^^^^^^^^^^^^^^^^^^^^\n");
     #endif
     for (int j = 0; j < d->data_amount; j++) {
+      #ifdef PRETTY_TRAIN
+        printf(THEME "\n____________\n");
+        printf(THEME "        test");
+        printf(THEME ": ");
+        printf(EPOCH "%d\n", j + 1);
+        printf(THEME "^^^^^^^^^^^^\n\n");
+      #endif
       error += fabs(train(p, d->data[j], learning_rate, d->targets[j]));
+      #ifdef PRETTY_TRAIN
+        printf(THEME "  epoch error: ");
+        if (error < target_error) {
+          printf(ANSI_COLOR_GREEN "%.7f", error);
+        } else if (error > CLOSE) {
+          printf(CLOSEC "%.7f", error);
+        } else {
+          printf(FARC "%.7f", error);
+        }
+        printf(THEME "\n");
+      #endif
     }
     if (error < target_error) {
-      printf("target error reached on epoch %d: %.5f\n", i, error);
-      return;
+      #ifdef PRETTY
+        printf(THEME "\ntarget error reached on epoch " VARIABLE "%d" THEME ": " ANSI_COLOR_GREEN "%.7f\n", i, error);
+        print_perceptron(p);
+        printf("\n\n");
+      #endif
+      #ifdef OUTPUT_EPOCH
+        printf("%d\n", i);
+      #endif
+      return i;
     }
-    error = 0;
   }
+  #ifdef PRETTY_TRAIN
+    printf(THEME "\n");
+    printf(THEME "target epoch reached: ");
+    printf(EPOCH "%d", epochs);
+    printf(THEME "  epoch error: ");
+    printf(ANSI_COLOR_RED "%.7f", error);
+    printf(THEME "\n");
+  #endif
+  return epochs;
 }
 
 // print_perceptron(p) prints the perceptron to the console
 // requires: p is not null
 // effects: writes to the console
 void print_perceptron(perceptron *p) {
+  printf(THEME "  perceptron:  ");
   for (int i = 0; i < p->input_amount; i++) {
-    printf("| %.2f ", p->weights[i]);
+    printf(THEME " | ");
+    if (p->weights[i] < 0) {
+      printf(PERCEPTRONC "%.7f ", p->weights[i]);
+    } else {
+      printf(PERCEPTRONC " %.7f ", p->weights[i]);
+    }
   }
-  printf("|\n");
+  printf(THEME " |\n");
 }
 
 // print_inputs(in) prints the inputs to the console
 // requires: in is not null
 // effects: writes to the console
 void print_inputs(inputs *in) {
+  printf(THEME "  inputs:      ");
   for (int i = 0; i < in->input_amount; i++) {
-    printf("| %.2f ", in->data[i]);
+    printf(THEME " | ");
+    if (in->data[i] < 0) {
+      printf(INPUT "%.7f ", in->data[i]);
+    } else {
+      printf(INPUT " %.7f ", in->data[i]);
+    }
   }
-  printf("|\n");
+  printf(THEME " |\n");
 }
 
 // free_perceptron(p) frees the perceptron
