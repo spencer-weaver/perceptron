@@ -2,22 +2,25 @@
 #include "perceptron.h"
 
 int main(void) {
+
+  float learning_rate = 0.1;
+  int epochs = 1000;
   
-  int input_count = 2;
-  float bias = 2;
+  int input_count = 0;
+  int data_count = 0;
 
-  perceptron *p = init_perceptron(input_count, bias);
-  inputs *in = init_inputs(input_count);
+  scanf(" %d", &input_count);
+  scanf(" %d", &data_count);
 
-  read_inputs(in);
+  perceptron *p = init_perceptron(input_count);
+  data *d = init_data(data_count, input_count);
 
-  print_inputs(in);
-  print_perceptron(p);
-  
-  float sum = linear(p, in);
+  p->bias = 0;
 
-  printf("sum: %.2f\n", sum);
+  read_data(d);
+
+  fit(p, d, epochs, learning_rate, 0.001);
 
   free_perceptron(p);
-  free_inputs(in);
+  free_data(d);
 }

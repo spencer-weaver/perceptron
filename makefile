@@ -5,7 +5,7 @@ ODIR = obj
 CC = gcc
 CFLAGS = -I$(IDIR) -Wall -O2
 
-LIBS =
+LIBS = -lm
 
 _DEPS = perceptron.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))

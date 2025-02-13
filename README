@@ -1,0 +1,9 @@
+fun little project I made while procrastinating studying.
+
+run 
+  cat even_odd.in even_odd.expect | ./perceptron 
+to predict if 3 bit models are even or odd, and
+  cat and.in and.expect | ./perceptron
+for an and gate.
+
+work in progress.
