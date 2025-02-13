@@ -362,7 +362,7 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
       #endif
       error += fabs(train(p, d->data[j], learning_rate, d->targets[j]));
       #ifdef PRETTY_TRAIN
-        printf(THEME "  epoch error: ");
+        printf(THEME "  test error: ");
         if (error < target_error) {
           printf(GREEN "%.7f", error);
         } else if (error < CLOSE) {
