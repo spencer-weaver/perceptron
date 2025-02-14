@@ -7,8 +7,8 @@
 #define LEARNING_RATE 0.1
 #define TARGET_ERROR 0.0001
 
-//#define TEST_TRAIN_PERCEPTRON
-#define TEST_OPTIMIZE_LEARN
+#define TEST_TRAIN_PERCEPTRON
+//#define TEST_OPTIMIZE_LEARN
 
 int main(void) {
   
