@@ -19,6 +19,14 @@ $(ODIR)/%.o: $(SDIR)/%.c $(DEPS)
 perceptron: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
+test-and: $(OBJ)
+	$(CC) -c -o $@ $< $(CFLAGS)
+	cat test_data/and.in test_data/and.expect | ./perceptron
+
+test-even-odd: $(OBJ)
+	$(CC) -c -o $@ $< $(CFLAGS)
+	cat test_data/even_odd.in test_data/even_odd.expect | ./perceptron
+
 $(ODIR):
 	mkdir -p $(ODIR)
 

@@ -8,7 +8,7 @@
 //#define RAW
 
 // outputs the training data in a nice format
-//#define PRETTY_TRAIN
+#define PRETTY_TRAIN
 // outputs the raw training data
 //#define RAW_TRAIN
 
