@@ -354,6 +354,9 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
   float error = 0;
   for (int i = 0; i < epochs; i++) {
     error = 0;
+    #ifdef RAW_TRAIN
+      printf("%d\n", i + 1);
+    #endif
     #ifdef PRETTY_TRAIN
       printf(THEME "\n_______________________\n");
       printf(THEME "                        \\\n");
@@ -372,8 +375,13 @@ int fit(perceptron *p, data *d, int epochs, float learning_rate, float target_er
         printf(THEME "^^^^^^^^^^^^\n\n");
       #endif
       #ifdef RAW_TRAIN
+        printf(" %d\n", j + 1);
+        print_inputs(d->data[j]);
+        printf("\n");
+        printf(" %.7f\n", d->targets[j]);
         print_perceptron(p);
         printf("\n");
+        printf(" %.7f\n", predict(p, d->data[j]));
       #endif
       error += fabs(train(p, d->data[j], learning_rate, d->targets[j]));
       #ifdef PRETTY_TRAIN
@@ -453,16 +461,22 @@ void print_perceptron(perceptron *p) {
 // requires: in is not null
 // effects: writes to the console
 void print_inputs(inputs *in) {
-  printf(THEME "  inputs:      ");
+  #ifndef RAW_TRAIN
+    printf(THEME "  inputs:      ");
+  #endif
   for (int i = 0; i < in->input_amount; i++) {
-    printf(THEME " | ");
+    #ifndef RAW_TRAIN
+      printf(THEME " | ");
+    #endif
     if (in->data[i] < 0) {
       printf(INPUT "%.7f ", in->data[i]);
     } else {
       printf(INPUT " %.7f ", in->data[i]);
     }
   }
-  printf(THEME " |\n");
+  #ifndef RAW_TRAIN
+    printf(THEME " | ");
+  #endif
 }
 
 // free_perceptron(p) frees the perceptron
